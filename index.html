@@ -388,7 +388,13 @@
         </div>
     </div>
 
-    <script src="main.js"></script>
+    <!-- Firebase (Compat) عبر CDN -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+    <!-- ملفاتك (حافظ على هذا الترتيب) -->
+    <script src="./firebase.js"></script>
+    <script defer src="./main.js"></script>
 </body>
 </html>
 
