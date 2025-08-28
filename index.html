@@ -1,400 +1,286 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>إدارة مالي — نسخة Firebase v4.0</title>
-    
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { 
-            getFirestore, 
-            collection, 
-            doc, 
-            addDoc, 
-            updateDoc, 
-            deleteDoc, 
-            getDocs, 
-            getDoc, 
-            setDoc, 
-            query, 
-            where, 
-            orderBy, 
-            onSnapshot 
-        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>إدارة مالي — نسخة Firebase v4.0</title>
 
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDJtbThBhZ4bmIoxTr5SseoU3VoSC4ZuU",
-            authDomain: "index-599e8.firebaseapp.com",
-            projectId: "index-599e8",
-            storageBucket: "index-599e8.firebasestorage.app",
-            messagingSenderId: "57008792504",
-            appId: "1:57008792504:web:16c083ad855e787143254d",
-            measurementId: "G-CQNV5H3RKG"
-        };
+  <!-- ⚠️ تمت إزالة أي سكربت Firebase من <head> لتجنّب التهيئة المزدوجة -->
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 
-        // Make Firebase available globally
-        window.db = db;
-        window.firebaseModules = {
-            collection,
-            doc,
-            addDoc,
-            updateDoc,
-            deleteDoc,
-            getDocs,
-            getDoc,
-            setDoc,
-            query,
-            where,
-            orderBy,
-            onSnapshot
-        };
-    </script>
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- ✅ Enhanced Topbar -->
-    <div class="topbar">
-        <div class="title">
-            <h1>💰 إدارة مالي الشخصية</h1>
-            <div class="badge">v4.0</div>
+  <!-- ✅ Topbar -->
+  <div class="topbar">
+    <div class="title">
+      <h1>💰 إدارة مالي الشخصية</h1>
+      <div class="badge">v4.0</div>
+    </div>
+    <div class="topbar-actions">
+      <div class="notification-badge" id="alertsCount" style="display: none;">
+        <span id="alertsText">0 تنبيه</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ Container -->
+  <div class="container">
+    <!-- الإعدادات والتحكم -->
+    <section id="settings" class="card">
+      <h2><span class="card-icon">⚙️</span>الإعدادات والتحكم</h2>
+      <div class="toolbar">
+        <div class="grow">
+          <label>راتب الشهر (ر.س)</label>
+          <input id="salaryInput" type="number" placeholder="مثال: 7400">
         </div>
-        <div class="topbar-actions">
-            <div class="notification-badge" id="alertsCount" style="display: none;">
-                <span id="alertsText">0 تنبيه</span>
-            </div>
+        <div class="grow">
+          <label>الادخار المستهدف (ر.س)</label>
+          <input id="savingTargetInput" type="number" placeholder="مثال: 1200">
         </div>
+        <div class="grow">
+          <label>الشهر المعروض</label>
+          <input id="monthPicker" type="month">
+        </div>
+        <button id="saveSettingsBtn" class="btn primary">💾 حفظ</button>
+      </div>
+
+      <div class="toolbar mt-4">
+        <label class="switch">
+          <input type="checkbox" id="cashMode">
+          <span class="slider"></span>
+          💵 وضع نقدي
+        </label>
+        <small class="muted">يحسب الأقساط/الفواتير المعلّمة «مدفوع» فقط</small>
+
+        <label class="switch">
+          <input type="checkbox" id="autoDeduct">
+          <span class="slider"></span>
+          ⚡ خصم تلقائي
+        </label>
+        <small class="muted">يعلم «مدفوع» تلقائيًا يوم الاستحقاق عند فتح الصفحة</small>
+
+        <label class="switch">
+          <input type="checkbox" id="rollover">
+          <span class="slider"></span>
+          📋 ترحيل المتأخر
+        </label>
+        <small class="muted">إنشاء بند خارجي للشهر التالي لأي قسط/فاتورة غير مدفوعة</small>
+
+        <label class="switch">
+          <input type="checkbox" id="themeToggle">
+          <span class="slider"></span>
+          🌞 الوضع الفاتح
+        </label>
+        <small class="muted">تبديل بين الوضع الفاتح والداكن</small>
+      </div>
+
+      <button id="applySuggestedBtn" class="btn secondary mt-4">📊 اعتماد الادخار المقترح (15%)</button>
+    </section>
+
+    <!-- KPIs -->
+    <div class="kpis">
+      <div class="kpi"><div class="lbl">💰 الدخل الشهري</div><div class="val" id="kpiIncome">٠ ر.س</div></div>
+      <div class="kpi"><div class="lbl">💸 إجمالي المصروف</div><div class="val" id="kpiExpense">٠ ر.س</div></div>
+      <div class="kpi"><div class="lbl">🏦 الادخار المحقق</div><div class="val" id="kpiSaving">٠ ر.س</div></div>
+      <div class="kpi"><div class="lbl">💵 الصافي المتبقي</div><div class="val" id="kpiNet">٠ ر.س</div></div>
     </div>
 
-    <!-- ✅ Enhanced Container -->
-    <div class="container">
-        <!-- ✅ الإعدادات والتحكم -->
-        <section id="settings" class="card">
-            <h2><span class="card-icon">⚙️</span>الإعدادات والتحكم</h2>
-            <div class="toolbar">
-                <div class="grow">
-                    <label>راتب الشهر (ر.س)</label>
-                    <input id="salaryInput" type="number" placeholder="مثال: 7400">
-                </div>
-                <div class="grow">
-                    <label>الادخار المستهدف (ر.س)</label>
-                    <input id="savingTargetInput" type="number" placeholder="مثال: 1200">
-                </div>
-                <div class="grow">
-                    <label>الشهر المعروض</label>
-                    <input id="monthPicker" type="month">
-                </div>
-                <button id="saveSettingsBtn" class="btn primary">💾 حفظ</button>
-            </div>
-            
-            <div class="toolbar mt-4">
-                <label class="switch">
-                    <input type="checkbox" id="cashMode">
-                    <span class="slider"></span>
-                    💵 وضع نقدي
-                </label>
-                <small class="muted">يحسب الأقساط/الفواتير المعلّمة «مدفوع» فقط</small>
-                
-                <label class="switch">
-                    <input type="checkbox" id="autoDeduct">
-                    <span class="slider"></span>
-                    ⚡ خصم تلقائي
-                </label>
-                <small class="muted">يعلم «مدفوع» تلقائيًا يوم الاستحقاق عند فتح الصفحة</small>
-                
-                <label class="switch">
-                    <input type="checkbox" id="rollover">
-                    <span class="slider"></span>
-                    📋 ترحيل المتأخر
-                </label>
-                <small class="muted">إنشاء بند خارجي للشهر التالي لأي قسط/فاتورة غير مدفوعة</small>
-                
-                <label class="switch">
-                    <input type="checkbox" id="themeToggle">
-                    <span class="slider"></span>
-                    🌞 الوضع الفاتح
-                </label>
-                <small class="muted">تبديل بين الوضع الفاتح والداكن</small>
-            </div>
-            
-            <button id="applySuggestedBtn" class="btn secondary mt-4">📊 اعتماد الادخار المقترح (15%)</button>
-        </section>
+    <!-- Charts -->
+    <section id="charts" class="card">
+      <h2><span class="card-icon">📊</span>التحليلات والرسوم البيانية</h2>
+      <p class="muted">📈 تحليل مالي تفاعلي مع رسوم بيانية متقدمة</p>
+      <div class="charts">
+        <div class="chart-container"><canvas id="trendChart"></canvas></div>
+        <div class="chart-container"><canvas id="expenseChart"></canvas></div>
+      </div>
+    </section>
 
-        <!-- ✅ Enhanced KPIs -->
-        <div class="kpis">
-            <div class="kpi">
-                <div class="lbl">💰 الدخل الشهري</div>
-                <div class="val" id="kpiIncome">٠ ر.س</div>
-            </div>
-            <div class="kpi">
-                <div class="lbl">💸 إجمالي المصروف</div>
-                <div class="val" id="kpiExpense">٠ ر.س</div>
-            </div>
-            <div class="kpi">
-                <div class="lbl">🏦 الادخار المحقق</div>
-                <div class="val" id="kpiSaving">٠ ر.س</div>
-            </div>
-            <div class="kpi">
-                <div class="lbl">💵 الصافي المتبقي</div>
-                <div class="val" id="kpiNet">٠ ر.س</div>
-            </div>
+    <!-- الأقساط الثابتة -->
+    <section id="installments" class="card">
+      <h2><span class="card-icon">🏦</span>الأقساط الثابتة</h2>
+      <form id="instForm" class="toolbar">
+        <input id="instName" placeholder="اسم القسط (قسط سيارة)" required>
+        <input id="instAmount" type="number" placeholder="مبلغ شهري" required>
+        <input id="instStart" type="month" required>
+        <input id="instEnd" type="month" placeholder="(اختياري) تاريخ انتهاء">
+        <input id="instDueDay" type="number" min="1" max="31" placeholder="يوم الاستحقاق">
+        <button type="submit" class="btn primary">➕ إضافة</button>
+      </form>
+      <div class="table-container">
+        <table class="table" id="instTable">
+          <thead><tr><th>الاسم</th><th>المبلغ</th><th>استحقاق هذا الشهر</th><th>يوم الاستحقاق</th><th>المدى</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- الفواتير الشهرية -->
+    <section id="bills" class="card">
+      <h2><span class="card-icon">🧾</span>الفواتير الشهرية</h2>
+      <form id="billForm" class="toolbar">
+        <input id="billName" placeholder="اسم (إنترنت/كهرباء/جوال)" required>
+        <input id="billAmount" type="number" placeholder="مبلغ شهري" required>
+        <input id="billStart" type="month" required>
+        <input id="billEnd" type="month" placeholder="(اختياري) تاريخ انتهاء">
+        <input id="billDueDay" type="number" min="1" max="31" placeholder="يوم الاستحقاق">
+        <button type="submit" class="btn primary">➕ إضافة</button>
+      </form>
+      <div class="table-container">
+        <table class="table" id="billTable">
+          <thead><tr><th>الاسم</th><th>المبلغ</th><th>استحقاق هذا الشهر</th><th>يوم الاستحقاق</th><th>المدى</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- المصاريف اليومية -->
+    <section id="expenses" class="card">
+      <h2><span class="card-icon">💳</span>المصاريف اليومية</h2>
+      <div class="toolbar">
+        <input id="searchInput" placeholder="🔍 بحث في المصاريف اليومية..." class="grow">
+        <button id="exportCSV" class="btn ghost">📄 تصدير CSV</button>
+        <button id="exportJSON" class="btn ghost">📋 تصدير JSON</button>
+        <button id="importData" class="btn ghost">📥 استيراد بيانات</button>
+      </div>
+      <form id="expForm" class="toolbar">
+        <input id="expDate" type="date" required>
+        <input id="expCat" placeholder="تصنيف (أكل/مواصلات)" required>
+        <input id="expNote" placeholder="ملاحظة">
+        <input id="expAmount" type="number" placeholder="المبلغ" required>
+        <select id="expPay">
+          <option value="cash">💵 نقدًا</option>
+          <option value="card">💳 بطاقة</option>
+          <option value="transfer">🏦 تحويل</option>
+          <option value="wallet">📱 محفظة رقمية</option>
+        </select>
+        <button type="submit" class="btn primary">➕ إضافة</button>
+      </form>
+      <div class="table-container">
+        <table class="table" id="expTable">
+          <thead><tr><th>التاريخ</th><th>التصنيف</th><th>الملاحظة</th><th>طريقة الدفع</th><th>المبلغ</th><th>الإجراءات</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- مصاريف خارجية -->
+    <section id="external" class="card">
+      <h2><span class="card-icon">⚠️</span>مصاريف خارجية</h2>
+      <form id="oneForm" class="toolbar">
+        <input id="oneDate" type="date" required>
+        <input id="oneCat" placeholder="النوع (مخالفة/رسوم حكومية...)" required>
+        <input id="oneNote" placeholder="ملاحظة">
+        <input id="oneAmount" type="number" placeholder="المبلغ" required>
+        <label class="switch">
+          <input type="checkbox" id="onePaid">
+          <span class="slider"></span>
+          ✅ مدفوعة الآن
+        </label>
+        <button type="submit" class="btn primary">➕ إضافة</button>
+      </form>
+      <div class="table-container">
+        <table class="table" id="oneTable">
+          <thead><tr><th>التاريخ</th><th>النوع</th><th>الملاحظة</th><th>المبلغ</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ميزانيات التصنيفات -->
+    <section id="budgets" class="card">
+      <h2><span class="card-icon">🎯</span>ميزانيات التصنيفات</h2>
+      <form id="budForm" class="toolbar">
+        <input id="budCat" placeholder="تصنيف (أكل/مواصلات/…)" required>
+        <input id="budLimit" type="number" placeholder="الحد الشهري (ر.س)" required>
+        <button type="submit" class="btn primary">💾 حفظ الميزانية</button>
+      </form>
+      <div class="table-container">
+        <table class="table" id="budTable">
+          <thead><tr><th>التصنيف</th><th>الحد المحدد</th><th>المصروف الحالي</th><th>النسبة المستهلكة</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- الملخص الشهري التفصيلي -->
+    <section id="summary" class="card">
+      <h2><span class="card-icon">📋</span>الملخص الشهري التفصيلي</h2>
+      <div class="toolbar">
+        <button id="generateReport" class="btn secondary">📊 تقرير مفصل</button>
+        <button id="compareMonths" class="btn secondary">📈 مقارنة الأشهر</button>
+        <button id="exportSummary" class="btn ghost">📄 تصدير الملخص</button>
+      </div>
+      <div id="monthSummary"></div>
+    </section>
+  </div>
+
+  <!-- ✅ Bottom Navigation -->
+  <nav class="bottom-nav">
+    <a href="#settings" class="active"><span class="icon">⚙️</span><span class="label">إعدادات</span></a>
+    <a href="#expenses"><span class="icon">💳</span><span class="label">مصاريف</span></a>
+    <a href="#budgets"><span class="icon">🎯</span><span class="label">ميزانيات</span></a>
+    <a href="#installments"><span class="icon">🏦</span><span class="label">أقساط</span></a>
+    <a href="#bills"><span class="icon">🧾</span><span class="label">فواتير</span></a>
+    <a href="#charts"><span class="icon">📊</span><span class="label">رسوم</span></a>
+  </nav>
+
+  <!-- ✅ FAB -->
+  <button class="fab" id="fabAdd">➕</button>
+
+  <!-- ✅ Toast -->
+  <div id="toast" class="toast"></div>
+
+  <!-- ✅ Quick Add Modal -->
+  <div class="modal" id="quickModal">
+    <div class="sheet">
+      <div class="handle"></div>
+      <h3>💰 إضافة مصروف سريع</h3>
+      <form id="quickForm">
+        <input id="qDate" type="date" required>
+        <select id="qPay">
+          <option value="cash">💵 نقدًا</option>
+          <option value="card">💳 بطاقة</option>
+          <option value="transfer">🏦 تحويل</option>
+          <option value="wallet">📱 محفظة رقمية</option>
+        </select>
+        <input id="qCat" placeholder="تصنيف" required>
+        <input id="qAmount" type="number" placeholder="المبلغ (ر.س)" required>
+        <input id="qNote" class="full" placeholder="ملاحظة (اختياري)">
+        <div class="full flex gap-4 mt-4">
+          <button class="btn ghost" id="qCancel" type="button">❌ إلغاء</button>
+          <button class="btn primary" type="submit">💾 حفظ</button>
         </div>
-
-        <!-- ✅ Enhanced Charts -->
-        <section id="charts" class="card">
-            <h2><span class="card-icon">📊</span>التحليلات والرسوم البيانية</h2>
-            <p class="muted">📈 تحليل مالي تفاعلي مع رسوم بيانية متقدمة</p>
-            <div class="charts">
-                <div class="chart-container">
-                    <canvas id="trendChart"></canvas>
-                </div>
-                <div class="chart-container">
-                    <canvas id="expenseChart"></canvas>
-                </div>
-            </div>
-        </section>
-
-        <!-- ✅ الأقساط الثابتة -->
-        <section id="installments" class="card">
-            <h2><span class="card-icon">🏦</span>الأقساط الثابتة</h2>
-            <form id="instForm" class="toolbar">
-                <input id="instName" placeholder="اسم القسط (قسط سيارة)" required>
-                <input id="instAmount" type="number" placeholder="مبلغ شهري" required>
-                <input id="instStart" type="month" required>
-                <input id="instEnd" type="month" placeholder="(اختياري) تاريخ انتهاء">
-                <input id="instDueDay" type="number" min="1" max="31" placeholder="يوم الاستحقاق">
-                <button type="submit" class="btn primary">➕ إضافة</button>
-            </form>
-            <div class="table-container">
-                <table class="table" id="instTable">
-                    <thead>
-                        <tr>
-                            <th>الاسم</th>
-                            <th>المبلغ</th>
-                            <th>استحقاق هذا الشهر</th>
-                            <th>يوم الاستحقاق</th>
-                            <th>المدى</th>
-                            <th>الحالة</th>
-                            <th>الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- ✅ الفواتير الشهرية -->
-        <section id="bills" class="card">
-            <h2><span class="card-icon">🧾</span>الفواتير الشهرية</h2>
-            <form id="billForm" class="toolbar">
-                <input id="billName" placeholder="اسم (إنترنت/كهرباء/جوال)" required>
-                <input id="billAmount" type="number" placeholder="مبلغ شهري" required>
-                <input id="billStart" type="month" required>
-                <input id="billEnd" type="month" placeholder="(اختياري) تاريخ انتهاء">
-                <input id="billDueDay" type="number" min="1" max="31" placeholder="يوم الاستحقاق">
-                <button type="submit" class="btn primary">➕ إضافة</button>
-            </form>
-            <div class="table-container">
-                <table class="table" id="billTable">
-                    <thead>
-                        <tr>
-                            <th>الاسم</th>
-                            <th>المبلغ</th>
-                            <th>استحقاق هذا الشهر</th>
-                            <th>يوم الاستحقاق</th>
-                            <th>المدى</th>
-                            <th>الحالة</th>
-                            <th>الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- ✅ المصاريف اليومية -->
-        <section id="expenses" class="card">
-            <h2><span class="card-icon">💳</span>المصاريف اليومية</h2>
-            <div class="toolbar">
-                <input id="searchInput" placeholder="🔍 بحث في المصاريف اليومية..." class="grow">
-                <button id="exportCSV" class="btn ghost">📄 تصدير CSV</button>
-                <button id="exportJSON" class="btn ghost">📋 تصدير JSON</button>
-                <button id="importData" class="btn ghost">📥 استيراد بيانات</button>
-            </div>
-            <form id="expForm" class="toolbar">
-                <input id="expDate" type="date" required>
-                <input id="expCat" placeholder="تصنيف (أكل/مواصلات)" required>
-                <input id="expNote" placeholder="ملاحظة">
-                <input id="expAmount" type="number" placeholder="المبلغ" required>
-                <select id="expPay">
-                    <option value="cash">💵 نقدًا</option>
-                    <option value="card">💳 بطاقة</option>
-                    <option value="transfer">🏦 تحويل</option>
-                    <option value="wallet">📱 محفظة رقمية</option>
-                </select>
-                <button type="submit" class="btn primary">➕ إضافة</button>
-            </form>
-            <div class="table-container">
-                <table class="table" id="expTable">
-                    <thead>
-                        <tr>
-                            <th>التاريخ</th>
-                            <th>التصنيف</th>
-                            <th>الملاحظة</th>
-                            <th>طريقة الدفع</th>
-                            <th>المبلغ</th>
-                            <th>الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- ✅ مصاريف خارجية -->
-        <section id="external" class="card">
-            <h2><span class="card-icon">⚠️</span>مصاريف خارجية</h2>
-            <form id="oneForm" class="toolbar">
-                <input id="oneDate" type="date" required>
-                <input id="oneCat" placeholder="النوع (مخالفة/رسوم حكومية...)" required>
-                <input id="oneNote" placeholder="ملاحظة">
-                <input id="oneAmount" type="number" placeholder="المبلغ" required>
-                <label class="switch">
-                    <input type="checkbox" id="onePaid">
-                    <span class="slider"></span>
-                    ✅ مدفوعة الآن
-                </label>
-                <button type="submit" class="btn primary">➕ إضافة</button>
-            </form>
-            <div class="table-container">
-                <table class="table" id="oneTable">
-                    <thead>
-                        <tr>
-                            <th>التاريخ</th>
-                            <th>النوع</th>
-                            <th>الملاحظة</th>
-                            <th>المبلغ</th>
-                            <th>الحالة</th>
-                            <th>الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- ✅ ميزانيات التصنيفات -->
-        <section id="budgets" class="card">
-            <h2><span class="card-icon">🎯</span>ميزانيات التصنيفات</h2>
-            <form id="budForm" class="toolbar">
-                <input id="budCat" placeholder="تصنيف (أكل/مواصلات/…)" required>
-                <input id="budLimit" type="number" placeholder="الحد الشهري (ر.س)" required>
-                <button type="submit" class="btn primary">💾 حفظ الميزانية</button>
-            </form>
-            <div class="table-container">
-                <table class="table" id="budTable">
-                    <thead>
-                        <tr>
-                            <th>التصنيف</th>
-                            <th>الحد المحدد</th>
-                            <th>المصروف الحالي</th>
-                            <th>النسبة المستهلكة</th>
-                            <th>الحالة</th>
-                            <th>الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- ✅ الملخص الشهري التفصيلي -->
-        <section id="summary" class="card">
-            <h2><span class="card-icon">📋</span>الملخص الشهري التفصيلي</h2>
-            <div class="toolbar">
-                <button id="generateReport" class="btn secondary">📊 تقرير مفصل</button>
-                <button id="compareMonths" class="btn secondary">📈 مقارنة الأشهر</button>
-                <button id="exportSummary" class="btn ghost">📄 تصدير الملخص</button>
-            </div>
-            <div id="monthSummary"></div>
-        </section>
+      </form>
     </div>
+  </div>
 
-    <!-- ✅ Enhanced Bottom Navigation -->
-    <nav class="bottom-nav">
-        <a href="#settings" class="active"><span class="icon">⚙️</span><span class="label">إعدادات</span></a>
-        <a href="#expenses"><span class="icon">💳</span><span class="label">مصاريف</span></a>
-        <a href="#budgets"><span class="icon">🎯</span><span class="label">ميزانيات</span></a>
-        <a href="#installments"><span class="icon">🏦</span><span class="label">أقساط</span></a>
-        <a href="#bills"><span class="icon">🧾</span><span class="label">فواتير</span></a>
-        <a href="#charts"><span class="icon">📊</span><span class="label">رسوم</span></a>
-    </nav>
-
-    <!-- ✅ Enhanced FAB -->
-    <button class="fab" id="fabAdd">➕</button>
-
-    <!-- ✅ Enhanced Toast -->
-    <div id="toast" class="toast"></div>
-
-    <!-- ✅ نافذة الإضافة السريعة المحسنة -->
-    <div class="modal" id="quickModal">
-        <div class="sheet">
-            <div class="handle"></div>
-            <h3>💰 إضافة مصروف سريع</h3>
-            <form id="quickForm">
-                <input id="qDate" type="date" required>
-                <select id="qPay">
-                    <option value="cash">💵 نقدًا</option>
-                    <option value="card">💳 بطاقة</option>
-                    <option value="transfer">🏦 تحويل</option>
-                    <option value="wallet">📱 محفظة رقمية</option>
-                </select>
-                <input id="qCat" placeholder="تصنيف" required>
-                <input id="qAmount" type="number" placeholder="المبلغ (ر.س)" required>
-                <input id="qNote" class="full" placeholder="ملاحظة (اختياري)">
-                <div class="full flex gap-4 mt-4">
-                    <button class="btn ghost" id="qCancel" type="button">❌ إلغاء</button>
-                    <button class="btn primary" type="submit">💾 حفظ</button>
-                </div>
-            </form>
-        </div>
+  <!-- ✅ Import Modal -->
+  <div class="modal" id="importModal">
+    <div class="sheet">
+      <div class="handle"></div>
+      <h3>📥 استيراد البيانات</h3>
+      <div class="mb-4">
+        <label class="muted">اختر ملف JSON أو CSV:</label>
+        <input type="file" id="importFile" accept=".json,.csv" class="mt-2">
+      </div>
+      <div class="flex gap-4">
+        <button class="btn ghost" id="importCancel">❌ إلغاء</button>
+        <button class="btn primary" id="importConfirm">📥 استيراد</button>
+      </div>
     </div>
+  </div>
 
-    <!-- ✅ نافذة استيراد البيانات -->
-    <div class="modal" id="importModal">
-        <div class="sheet">
-            <div class="handle"></div>
-            <h3>📥 استيراد البيانات</h3>
-            <div class="mb-4">
-                <label class="muted">اختر ملف JSON أو CSV:</label>
-                <input type="file" id="importFile" accept=".json,.csv" class="mt-2">
-            </div>
-            <div class="flex gap-4">
-                <button class="btn ghost" id="importCancel">❌ إلغاء</button>
-                <button class="btn primary" id="importConfirm">📥 استيراد</button>
-            </div>
-        </div>
-    </div>
+  <!-- 🔥 Firebase (Compat) عبر CDN — التحميل هنا فقط -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
-    <!-- Firebase (Compat) عبر CDN -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
-    <!-- ملفاتك (حافظ على هذا الترتيب) -->
-    <script src="./firebase.js"></script>
-    <script defer src="./main.js"></script>
+  <!-- ملفاتك (هذا الترتيب مهم) -->
+  <script src="./firebase.js"></script>
+  <script defer src="./main.js"></script>
 </body>
 </html>
-
