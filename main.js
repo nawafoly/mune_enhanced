@@ -28,12 +28,27 @@ class FirebaseDataManager {
     }
 
     async waitForFirebase() {
-        while (!window.db || !window.firebaseModules) {
-            await new Promise(resolve => setTimeout(resolve, 100));
-        }
-        this.db = window.db;
-        this.firebase = window.firebaseModules;
-        console.log('Firebase initialized successfully');
+        return new Promise((resolve) => {
+            if (window.db && window.firebaseModules) {
+                this.db = window.db;
+                this.firebase = window.firebaseModules;
+                console.log('Firebase initialized successfully');
+                resolve();
+            } else {
+                window.addEventListener('firebaseReady', () => {
+                    if (!window.db) {
+                        console.warn('No Firestore; falling back to localStorage');
+                        this.db = null;
+                        this.firebase = null;
+                    } else {
+                        this.db = window.db;
+                        this.firebase = window.firebaseModules;
+                        console.log('Firebase initialized successfully');
+                    }
+                    resolve();
+                });
+            }
+        });
     }
 
     // Generic CRUD operations with offline support
