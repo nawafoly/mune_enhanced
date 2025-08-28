@@ -1106,9 +1106,54 @@
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(248, 250, 252, 0.8) 100%);
         }
     </style>
+    <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDJtbThBhZr4bmIoxTr55seoU3VoSC4ZuU",
+    authDomain: "index-599e8.firebaseapp.com",
+    projectId: "index-599e8",
+    storageBucket: "index-599e8.firebasestorage.app",
+    messagingSenderId: "57008792504",
+    appId: "1:57008792504:web:16c083ad855e787143254d",
+    measurementId: "G-CQNV5H3RKG"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // لحفظ بيانات
+  async function saveData() {
+    try {
+      await addDoc(collection(db, "users"), {
+        name: "نواف",
+        message: "مرحبًا من Firebase!"
+      });
+      alert("✅ تم الحفظ بنجاح");
+    } catch (e) {
+      console.error("❌ خطأ في الحفظ:", e);
+    }
+  }
+
+  // لعرض البيانات
+  async function getData() {
+    const querySnapshot = await getDocs(collection(db, "users"));
+    querySnapshot.forEach((doc) => {
+      console.log(`${doc.id} =>`, doc.data());
+    });
+  }
+
+  window.saveData = saveData;
+  window.getData = getData;
+</script>
+
 </head>
 
 <body>
+<button onclick="saveData()">💾 حفظ تجربة</button>
+<button onclick="getData()">📄 عرض البيانات</button>
+
     <div class="topbar">
         <div class="title">
             <div>
