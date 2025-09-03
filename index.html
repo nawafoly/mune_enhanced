@@ -9,7 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap">
-        rel="stylesheet">
+
+    rel="stylesheet">
 
     <style>
         :root {
@@ -1107,46 +1108,46 @@
         }
     </style>
     <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDJtbThBhZr4bmIoxTr55seoU3VoSC4ZuU",
-    authDomain: "index-599e8.firebaseapp.com",
-    projectId: "index-599e8",
-    storageBucket: "index-599e8.firebasestorage.app",
-    messagingSenderId: "57008792504",
-    appId: "1:57008792504:web:16c083ad855e787143254d",
-    measurementId: "G-CQNV5H3RKG"
-  };
+        const firebaseConfig = {
+            apiKey: "AIzaSyDJtbThBhZr4bmIoxTr55seoU3VoSC4ZuU",
+            authDomain: "index-599e8.firebaseapp.com",
+            projectId: "index-599e8",
+            storageBucket: "index-599e8.firebasestorage.app",
+            messagingSenderId: "57008792504",
+            appId: "1:57008792504:web:16c083ad855e787143254d",
+            measurementId: "G-CQNV5H3RKG"
+        };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-  // لحفظ بيانات
-  async function saveData() {
-    try {
-      await addDoc(collection(db, "users"), {
-        name: "نواف",
-        message: "مرحبًا من Firebase!"
-      });
-      alert("✅ تم الحفظ بنجاح");
-    } catch (e) {
-      console.error("❌ خطأ في الحفظ:", e);
-    }
-  }
+        // لحفظ بيانات
+        async function saveData() {
+            try {
+                await addDoc(collection(db, "users"), {
+                    name: "نواف",
+                    message: "مرحبًا من Firebase!"
+                });
+                alert("✅ تم الحفظ بنجاح");
+            } catch (e) {
+                console.error("❌ خطأ في الحفظ:", e);
+            }
+        }
 
-  // لعرض البيانات
-  async function getData() {
-    const querySnapshot = await getDocs(collection(db, "users"));
-    querySnapshot.forEach((doc) => {
-      console.log(`${doc.id} =>`, doc.data());
-    });
-  }
+        // لعرض البيانات
+        async function getData() {
+            const querySnapshot = await getDocs(collection(db, "users"));
+            querySnapshot.forEach((doc) => {
+                console.log(`${doc.id} =>`, doc.data());
+            });
+        }
 
-  window.saveData = saveData;
-  window.getData = getData;
-</script>
+        window.saveData = saveData;
+        window.getData = getData;
+    </script>
 </head>
 
 <body>
@@ -1459,8 +1460,8 @@
             </div>
         </section>
 
-<button onclick="saveData()">💾 حفظ تجربة</button>
-<button onclick="getData()">📄 عرض البيانات</button>
+        <button onclick="saveData()">💾 حفظ تجربة</button>
+        <button onclick="getData()">📄 عرض البيانات</button>
 
     </main>
 
@@ -1708,13 +1709,13 @@
 
             showToast("✅ تم حفظ الإعدادات بنجاح!", "success");
             refreshInst();
-refreshBills();
-refreshExp();
-refreshOne();
-refreshBudgets();
-refreshSummary();
-refreshCharts();
-updateAlerts();
+            refreshBills();
+            refreshExp();
+            refreshOne();
+            refreshBudgets();
+            refreshSummary();
+            refreshCharts();
+            updateAlerts();
         };
 
         $("#applySuggestedBtn").onclick = () => {
@@ -1724,13 +1725,13 @@ updateAlerts();
             $("#savingTargetInput").value = suggested;
             showToast(`💡 تم تطبيق الادخار المقترح: ${fmt(suggested)}`, "success");
             refreshInst();
-refreshBills();
-refreshExp();
-refreshOne();
-refreshBudgets();
-refreshSummary();
-refreshCharts();
-updateAlerts();
+            refreshBills();
+            refreshExp();
+            refreshOne();
+            refreshBudgets();
+            refreshSummary();
+            refreshCharts();
+            updateAlerts();
         };
 
         $("#monthPicker").onchange = refreshAll;
@@ -2566,13 +2567,13 @@ updateAlerts();
             setPaid(kind, id, yyyymm, !current);
             showToast(current ? "❌ تم إلغاء تعليم الدفع" : "✅ تم تعليم كمدفوع", current ? "warning" : "success");
             refreshInst();
-refreshBills();
-refreshExp();
-refreshOne();
-refreshBudgets();
-refreshSummary();
-refreshCharts();
-updateAlerts();
+            refreshBills();
+            refreshExp();
+            refreshOne();
+            refreshBudgets();
+            refreshSummary();
+            refreshCharts();
+            updateAlerts();
         }
 
 
@@ -2585,13 +2586,13 @@ updateAlerts();
             setLS(K[kind], filtered);
             showToast("🗑️ تم حذف العنصر بنجاح", "success");
             refreshInst();
-refreshBills();
-refreshExp();
-refreshOne();
-refreshBudgets();
-refreshSummary();
-refreshCharts();
-updateAlerts();
+            refreshBills();
+            refreshExp();
+            refreshOne();
+            refreshBudgets();
+            refreshSummary();
+            refreshCharts();
+            updateAlerts();
         }
 
         function checkBudgetWarn(category) {
@@ -2905,13 +2906,13 @@ updateAlerts();
 
                     showToast("✅ تم استيراد البيانات بنجاح!", "success");
                     refreshInst();
-refreshBills();
-refreshExp();
-refreshOne();
-refreshBudgets();
-refreshSummary();
-refreshCharts();
-updateAlerts();
+                    refreshBills();
+                    refreshExp();
+                    refreshOne();
+                    refreshBudgets();
+                    refreshSummary();
+                    refreshCharts();
+                    updateAlerts();
 
                     const importModal = $("#importModal");
                     if (importModal) {
@@ -3319,13 +3320,13 @@ updateAlerts();
         document.addEventListener('DOMContentLoaded', () => {
             setupCharts();
             refreshInst();
-refreshBills();
-refreshExp();
-refreshOne();
-refreshBudgets();
-refreshSummary();
-refreshCharts();
-updateAlerts();
+            refreshBills();
+            refreshExp();
+            refreshOne();
+            refreshBudgets();
+            refreshSummary();
+            refreshCharts();
+            updateAlerts();
             updateActiveNavigation();
 
             // إضافة تأثيرات تفاعلية للبطاقات
